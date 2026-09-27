@@ -1,5 +1,10 @@
 .env
 .env.*
 !.env.example
+<<<<<<< HEAD
 node_modules/
 .vercel/
+=======
+.vercel
+node_modules
+>>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
