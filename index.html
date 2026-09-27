@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VarshaDrishti AI — Prototype Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A1628; --panel:#101F38; --panel2:#16294A; --border:#223353;
+    --teal:#21C4B0; --amber:#F2A93B; --text:#EAF2FA; --muted:#8CA0BE;
+    --low:#2ECC71; --med:#F2C94C; --high:#F2994A; --vhigh:#EB5757;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0D1C33,#0A1628);}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--teal),#0E7C6F);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#03211C;}
+  .brand h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.2px;}
+  .brand span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px;}
+  nav{display:flex;gap:4px;background:var(--panel);padding:4px;border-radius:10px;border:1px solid var(--border);}
+  nav button{background:transparent;border:none;color:var(--muted);padding:9px 18px;border-radius:7px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit;}
+  nav button.active{background:var(--teal);color:#03211C;font-weight:600;}
+  .status{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--low);box-shadow:0 0 6px var(--low);}
+
+  main{padding:24px 28px 60px;max-width:1360px;margin:0 auto;}
+  .view{display:none;} .view.active{display:block;}
+
+  /* ---- Dashboard ---- */
+  .dash{display:grid;grid-template-columns:290px 1fr;gap:20px;}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;}
+  .panel h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:0 0 12px;font-weight:600;}
+  .loc-list{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;}
+  .loc-btn{text-align:left;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;cursor:pointer;font-size:12.5px;font-family:inherit;line-height:1.35;}
+  .loc-btn b{display:block;font-size:13px;}
+  .loc-btn small{color:var(--muted);}
+  .loc-btn.active{border-color:var(--teal);background:#123A34;}
+  .slider-row{margin-bottom:16px;}
+  .slider-row label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:6px;}
+  .slider-row output{color:var(--text);font-weight:600;}
+  input[type=range]{width:100%;accent-color:var(--teal);}
+  .note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+  .live-card{background:#0E2A28;border:1px solid #1E4A45;border-radius:8px;padding:10px 12px;margin-bottom:18px;font-size:11.5px;}
+  .live-badge{color:var(--teal);font-weight:700;font-size:10.5px;letter-spacing:.5px;margin-bottom:6px;}
+  .live-row{display:flex;justify-content:space-between;color:#D9E4F2;margin-bottom:3px;}
+  .live-alert{margin-top:6px;padding:6px 8px;background:#3A2410;border:1px solid var(--amber);border-radius:6px;color:var(--amber);font-size:10.5px;font-weight:600;}
+  .live-meta{margin-top:8px;padding-top:8px;border-top:1px solid #1E4A45;color:var(--muted);font-size:9.5px;font-family:'IBM Plex Mono',monospace;line-height:1.5;}
+  .reset-live-btn{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--teal);padding:8px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;}
+
+  .dash-main{display:flex;flex-direction:column;gap:20px;}
+  #map{height:380px;border-radius:12px;border:1px solid var(--border);background:radial-gradient(ellipse at 50% 40%,#122744,#0A1628);position:relative;overflow:hidden;}
+  .weather-popup{position:absolute;display:none;background:#0E2237;border:1px solid #2E4E78;border-radius:8px;padding:8px 10px;font-size:10.5px;color:#D9E4F2;line-height:1.5;max-width:190px;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.4);z-index:5;}
+  .wp-alert{margin-top:4px;padding:4px 6px;background:#3A2410;border:1px solid var(--amber);border-radius:5px;color:var(--amber);font-size:9.5px;font-weight:600;}
+  .map-legend{position:absolute;right:10px;bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#8CA0BE;text-align:right;line-height:1.6;}
+  .legend-row{display:flex;align-items:center;justify-content:flex-end;gap:4px;}
+  .sw{width:8px;height:8px;border-radius:2px;display:inline-block;margin-left:4px;}
+  #map svg{width:100%;height:100%;display:block;}
+  .map-loc-dot{cursor:pointer;transition:r .2s ease;}
+  .map-loc-dot:hover{opacity:.85;}
+  .map-loc-label{font-family:'IBM Plex Mono',monospace;font-size:9px;fill:#8CA0BE;pointer-events:none;}
+  .map-loc-label.active{fill:#EAF2FA;font-weight:600;}
+  .map-corner{font-family:'IBM Plex Mono',monospace;font-size:9.5px;fill:#4A5F82;letter-spacing:.5px;}
+  @keyframes pulseRing{0%{r:9;opacity:.55;}100%{r:26;opacity:0;}}
+  .pulse-ring{animation:pulseRing 1.8s ease-out infinite;}
+  .score-row{display:grid;grid-template-columns:220px 1fr;gap:20px;}
+  .gauge-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .gauge{position:relative;width:170px;height:170px;}
+  .gauge svg{transform:rotate(-90deg);}
+  .gauge-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .gauge-num .n{font-size:34px;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+  .gauge-num .t{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+  .tier-badge{margin-top:12px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;}
+
+  .contrib{display:flex;flex-direction:column;gap:10px;justify-content:center;}
+  .contrib-row{display:grid;grid-template-columns:150px 1fr 46px;align-items:center;gap:10px;}
+  .contrib-row .lbl{font-size:12px;color:var(--muted);}
+  .bar-track{height:8px;background:var(--panel2);border-radius:4px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:4px;background:var(--teal);}
+  .contrib-row .val{font-size:11.5px;text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--muted);}
+
+  .alert-card{border-radius:10px;padding:16px 18px;border:1px solid var(--border);}
+  .alert-card .head{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;margin-bottom:6px;}
+  .alert-card p{margin:0;font-size:12.5px;color:#D9E4F2;line-height:1.6;}
+
+  /* ---- Pipeline ---- */
+  .stepper{display:flex;gap:6px;margin-bottom:20px;}
+  .step{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;}
+  .step .num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  .step .lbl{font-size:11.5px;font-weight:600;margin-top:2px;}
+  .step.done{border-color:var(--teal);}
+  .step.active{background:#123A34;border-color:var(--teal);}
+  .runbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .run-btn{background:var(--teal);color:#03211C;border:none;padding:10px 20px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;}
+  .run-btn:disabled{opacity:.5;cursor:default;}
+  .stage-panel{min-height:360px;}
+  .stage-title{font-size:15px;font-weight:600;margin:0 0 4px;}
+  .stage-sub{font-size:12.5px;color:var(--muted);margin:0 0 18px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .cvs-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;}
+  .cvs-card canvas{width:100%;border-radius:6px;}
+  .cvs-card p{font-size:11px;color:var(--muted);margin:8px 0 0;}
+  .checklist{display:flex;flex-direction:column;gap:10px;}
+  .check-item{display:flex;align-items:center;gap:10px;font-size:13px;opacity:0;transform:translateY(4px);transition:all .35s ease;}
+  .check-item.show{opacity:1;transform:none;}
+  .check-item .c{width:18px;height:18px;border-radius:50%;background:var(--teal);color:#03211C;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  footer{text-align:center;color:var(--muted);font-size:11px;padding:20px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">VD</div>
+    <div>
+      <h1>VarshaDrishti AI</h1>
+      <span>Prototype console — AegisAI · SIH26071</span>
+    </div>
+  </div>
+  <nav>
+    <button id="tab-pipeline" class="active">Pipeline</button>
+    <button id="tab-dash">Risk Dashboard</button>
+  </nav>
+  <div class="status"><span class="dot"></span> Demo engine running locally</div>
+</header>
+
+<main>
+
+  <!-- ============= PIPELINE VIEW ============= -->
+  <section id="view-pipeline" class="view active">
+    <div class="runbar">
+      <div>
+        <div style="font-size:15px;font-weight:600;">7-stage spatiotemporal pipeline</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Runs the same scoring engine used in the Risk Dashboard, staged end-to-end.</div>
+      </div>
+      <button class="run-btn" id="runPipelineBtn">Run full pipeline ▶</button>
+    </div>
+    <div class="stepper" id="stepper"></div>
+    <div class="panel stage-panel" id="stagePanel"></div>
+  </section>
+
+  <!-- ============= DASHBOARD VIEW ============= -->
+  <section id="view-dash" class="view">
+    <div class="dash">
+      <div class="panel">
+        <h2>Location</h2>
+        <div class="loc-list" id="locList"></div>
+        <div id="liveCard" class="live-card"></div>
+
+        <h2>Rainfall &amp; ground conditions</h2>
+        <div class="slider-row">
+          <label>Rainfall intensity <output id="oRain">80</output> mm/hr</label>
+          <input type="range" id="rain" min="5" max="150" value="80">
+        </div>
+        <div class="slider-row">
+          <label>Rainfall duration <output id="oDur">6</output> hrs</label>
+          <input type="range" id="dur" min="1" max="48" value="6">
+        </div>
+        <div class="slider-row">
+          <label>Antecedent soil saturation <output id="oSat">55</output>%</label>
+          <input type="range" id="sat" min="0" max="100" value="55">
+        </div>
+        <button id="resetLiveBtn" class="reset-live-btn">↺ Reset to live conditions</button>
+        <button id="refreshWeatherBtn" class="reset-live-btn">↻ Refresh Weather</button>
+        <div class="note">Coordinates are real locations. Sliders start from a live weather snapshot (see card above) and can be adjusted for scenario testing.</div>
+      </div>
+
+      <div class="dash-main">
+        <div id="map">
+          <svg id="mapSvg" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet"></svg>
+          <div id="weatherPopup" class="weather-popup"></div>
+          <div id="mapLegend" class="map-legend"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Predicted inundation risk</h2>
+          <div class="score-row">
+            <div class="gauge-wrap">
+              <div class="gauge">
+                <svg width="170" height="170">
+                  <circle cx="85" cy="85" r="72" stroke="#223353" stroke-width="14" fill="none"/>
+                  <circle id="gaugeArc" cx="85" cy="85" r="72" stroke="#21C4B0" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="452"/>
+                </svg>
+                <div class="gauge-num"><span class="n" id="scoreNum">--</span><span class="t">risk score</span></div>
+              </div>
+              <div class="tier-badge" id="tierBadge">—</div>
+            </div>
+            <div class="contrib" id="contrib"></div>
+          </div>
+        </div>
+
+        <div class="alert-card" id="alertCard"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+<footer>Prototype demo built for SIH26071 — AegisAI. All computation runs client-side in your browser.</footer>
+
+
+<script>
+/* ---------------- deterministic PRNG ---------------- */
+function seedFromString(s){let h=0;for(let i=0;i<s.length;i++){h=(Math.imul(31,h)+s.charCodeAt(i))|0;}return h>>>0;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+/* ---------------- reference locations (real coordinates) ---------------- */
+const LOCATIONS = [
+  {id:"kuttanad", name:"Alappuzha (Kuttanad), Kerala", basin:"Vembanad backwaters", lat:9.4981, lon:76.3388, elevation:0.5, drainage:0.15, terrainRisk:0.90},
+  {id:"majuli", name:"Majuli, Assam", basin:"Brahmaputra", lat:26.9500, lon:94.2000, elevation:85, drainage:0.45, terrainRisk:0.82},
+  {id:"darbhanga", name:"Darbhanga, Bihar", basin:"Kosi basin", lat:26.1542, lon:85.8918, elevation:49, drainage:0.20, terrainRisk:0.87},
+  {id:"mumbai", name:"Mumbai (Mithi basin)", basin:"Mithi River", lat:19.0760, lon:72.8777, elevation:14, drainage:0.30, terrainRisk:0.78},
+  {id:"chennai", name:"Chennai (Adyar/Cooum)", basin:"Adyar & Cooum", lat:13.0827, lon:80.2707, elevation:6, drainage:0.25, terrainRisk:0.75},
+  {id:"srinagar", name:"Srinagar, J&K", basin:"Jhelum valley", lat:34.0837, lon:74.7973, elevation:1585, drainage:0.55, terrainRisk:0.55},
+];
+
+/* ---------------- Open-Meteo live weather ---------------- */
+// No API key is required for the non-commercial Open-Meteo API.
+const LIVE_SOURCE = "Open-Meteo (live current conditions)";
+const LIVE = {};
+LOCATIONS.forEach(loc => {
+  LIVE[loc.id] = {
+    tempC:null, humidity:null, precip24h:0, precip3h:0,
+    phrase:"Waiting for live data", alert:null, fetchedAt:null
+  };
+  loc.live = LIVE[loc.id];
+});
+
+const WEATHER_POINTS = [
+  {name:"Delhi",state:"Delhi",lat:28.629,lon:77.217},
+  {name:"Jaipur",state:"Rajasthan",lat:26.929,lon:75.771},
+  {name:"Ahmedabad",state:"Gujarat",lat:23.013,lon:72.610},
+  {name:"Bhopal",state:"Madhya Pradesh",lat:23.244,lon:77.413},
+  {name:"Lucknow",state:"Uttar Pradesh",lat:26.822,lon:80.881},
+  {name:"Kolkata",state:"West Bengal",lat:22.526,lon:88.353},
+  {name:"Bhubaneswar",state:"Odisha",lat:20.297,lon:85.830},
+  {name:"Ranchi",state:"Jharkhand",lat:23.350,lon:85.322},
+  {name:"Raipur",state:"Chhattisgarh",lat:21.251,lon:81.640},
+  {name:"Hyderabad",state:"Telangana",lat:17.378,lon:78.459},
+  {name:"Bengaluru",state:"Karnataka",lat:12.975,lon:77.590},
+  {name:"Chandigarh",state:"Chandigarh",lat:30.730,lon:76.769},
+  {name:"Shimla",state:"Himachal Pradesh",lat:31.104,lon:77.172},
+  {name:"Dehradun",state:"Uttarakhand",lat:30.352,lon:78.039},
+  {name:"Guwahati",state:"Assam",lat:26.147,lon:91.673},
+  {name:"Amaravati",state:"Andhra Pradesh",lat:16.511,lon:80.511}
+];
+
+async function fetchOpenMeteoForCoords(lat, lon){
+  const res = await fetch(`/api/weather?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`);
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error || `Weather proxy HTTP ${res.status}`);
+  return data;
+}
+
+async function fetchOpenMeteoForLocation(loc){
+  const data = await fetchOpenMeteoForCoords(loc.lat, loc.lon);
+  Object.assign(loc.live, data);
+  loc.live.fetchedAt = new Date().toISOString();
+  return data;
+}
+
+async function fetchOpenMeteoForPoint(pt){
+  const data = await fetchOpenMeteoForCoords(pt.lat, pt.lon);
+  pt.tempC = data.tempC;
+  pt.humidity = data.humidity;
+  pt.precip24h = data.precip24h;
+  pt.precip3h = data.precip3h;
+  pt.phrase = data.phrase;
+  pt.alert = data.alert;
+  return data;
+}
+
+async function refreshOpenMeteo(){
+  const btn=document.getElementById('refreshWeatherBtn');
+  if(btn) { btn.disabled=true; btn.textContent='↻ Updating…'; }
+  let failures=0;
+  try{
+    const results = await Promise.allSettled([
+      ...LOCATIONS.map(loc => fetchOpenMeteoForLocation(loc)),
+      ...WEATHER_POINTS.map(pt => fetchOpenMeteoForPoint(pt))
+    ]);
+    failures = results.filter(r=>r.status==='rejected').length;
+    if(failures===0){
+      window.weatherStatus='Live Open-Meteo data';
+    } else if(failures < results.length){
+      window.weatherStatus=`Open-Meteo partially updated (${failures} failed)`;
+    } else {
+      window.weatherStatus='Open-Meteo unavailable';
+    }
+  }catch(e){
+    console.error(e);
+    window.weatherStatus='Open-Meteo unavailable';
+    failures=1;
+  }finally{
+    renderLocList();
+    renderLiveCard();
+    updateDashboard();
+    if(btn){ btn.disabled=false; btn.textContent='↻ Refresh Weather'; }
+  }
+}
+
+function weatherColor(p){
+  if(p<2) return '#3A5C8C';
+  if(p<10) return '#21C4B0';
+  if(p<25) return '#F2A93B';
+  return '#EB5757';
+}
+
+function liveDerivedInputs(loc){
+  const lv=loc.live;
+  const p24=Number(lv.precip24h)||0, p3=Number(lv.precip3h)||0, h=Number(lv.humidity)||0;
+  const rain=Math.max(1,Math.round((p3/3+p24/48)*10)/10*20);
+  const dur=p24>10?10:(p24>2?5:2);
+  const sat=Math.min(95,Math.round(35+p24*3+h*0.3));
+  return {rain:Math.min(150,Math.round(rain)),dur,sat};
+}
+
+let currentLoc=LOCATIONS[0];
+
+/* ---------------- risk model (transparent weighted baseline) ---------------- */
+const WEIGHTS = {rain:0.30, dur:0.15, sat:0.15, elev:0.15, drain:0.10, terrain:0.15};
+function computeRisk(loc, rain, dur, sat){
+  const rainN = Math.min(rain/150,1);
+  const durN  = Math.min(dur/48,1);
+  const satN  = sat/100;
+  const elevN = 1 - Math.min(loc.elevation/1600,1); // lower elevation -> higher contribution
+  const drainN= 1 - loc.drainage;                   // poorer drainage -> higher contribution
+  const terrN = loc.terrainRisk;
+
+  const contributions = {
+    "Rainfall intensity": WEIGHTS.rain*rainN,
+    "Rainfall duration":  WEIGHTS.dur*durN,
+    "Soil saturation":    WEIGHTS.sat*satN,
+    "Low elevation":      WEIGHTS.elev*elevN,
+    "Drainage capacity":  WEIGHTS.drain*drainN,
+    "Terrain susceptibility": WEIGHTS.terrain*terrN,
+  };
+  const raw = Object.values(contributions).reduce((a,b)=>a+b,0); // 0..1
+  const score = Math.round(Math.min(raw,1)*100);
+  let tier, color;
+  if(score<25){tier="Low";color="var(--low)";}
+  else if(score<50){tier="Medium";color="var(--med)";}
+  else if(score<75){tier="High";color="var(--high)";}
+  else {tier="Very High";color="var(--vhigh)";}
+  return {score, tier, color, contributions};
+}
+
+/* ---------------- self-contained SVG ops-map (no external tiles/keys/network) ---------------- */
+const MAP_W=600, MAP_H=400;
+const LON_MIN=68, LON_MAX=97.5, LAT_MIN=6, LAT_MAX=36;
+function project(lat,lon){
+  const x = ((lon-LON_MIN)/(LON_MAX-LON_MIN))*MAP_W;
+  const y = MAP_H - ((lat-LAT_MIN)/(LAT_MAX-LAT_MIN))*MAP_H;
+  return {x,y};
+}
+const svgns='http://www.w3.org/2000/svg';
+function svgEl(tag,attrs){
+  const el=document.createElementNS(svgns,tag);
+  for(const k in attrs) el.setAttribute(k,attrs[k]);
+  return el;
+}
+/* Simplified India boundary (approximate, for orientation only — not survey-accurate) */
+const INDIA_OUTLINE = [
+  [69.6,22.5],[70.5,22.8],[72.0,21.6],[72.8,20.7],[73.0,19.2],[72.8,18.0],
+  [73.3,16.5],[74.0,15.0],[74.3,13.9],[74.8,12.9],[75.3,11.5],[76.0,10.0],
+  [76.5,9.0],[77.2,8.3],[78.1,8.9],[79.2,9.3],[79.8,10.3],[80.2,11.5],
+  [80.3,13.1],[80.2,15.8],[80.4,17.0],[82.2,17.0],[83.3,17.7],[84.8,18.0],
+  [85.0,19.3],[86.5,20.3],[87.0,21.5],[88.0,21.6],[88.9,22.0],[89.0,23.5],
+  [88.5,24.5],[88.2,25.8],[88.9,26.4],[89.8,26.0],[91.0,25.2],[92.3,24.2],
+  [93.5,24.1],[94.6,23.8],[95.2,26.0],[97.0,27.0],[96.5,28.5],[94.5,29.0],
+  [92.0,27.9],[89.5,27.5],[88.2,27.4],[88.0,26.5],[87.0,26.4],[85.5,26.6],
+  [84.0,27.4],[82.0,28.1],[80.0,29.0],[81.0,30.2],[79.5,31.0],[78.5,32.5],
+  [77.0,32.8],[76.0,32.5],[75.5,34.0],[74.3,34.5],[73.9,34.0],[74.2,32.5],
+  [74.8,32.0],[74.5,30.8],[73.5,29.5],[71.7,27.9],[70.2,26.0],[70.0,24.5],
+  [69.6,22.5]
+];
+function buildOutlinePath(){
+  return INDIA_OUTLINE.map((pt,i)=>{
+    const {x,y}=project(pt[1],pt[0]);
+    return (i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
+  }).join(' ')+' Z';
+}
+function initMap(){
+  const svg=document.getElementById('mapSvg');
+  svg.innerHTML='';
+  // India landmass silhouette (approximate outline, for orientation)
+  svg.appendChild(svgEl('path',{d:buildOutlinePath(),fill:'#15294A',stroke:'#3A5C8C',"stroke-width":1.5,"stroke-linejoin":'round',opacity:0.9}));
+  // graticule (clipped visually by low opacity so the coastline reads clearly)
+  for(let lon=70;lon<=95;lon+=5){
+    const p1=project(LAT_MIN,lon), p2=project(LAT_MAX,lon);
+    svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:'#1C3155',"stroke-width":1,opacity:0.5}));
+  }
+  for(let lat=10;lat<=35;lat+=5){
+    const p1=project(lat,LON_MIN), p2=project(lat,LON_MAX);
+    svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:'#1C3155',"stroke-width":1,opacity:0.5}));
+  }
+  // corner labels
+  const c1=svgEl('text',{x:10,y:18,class:'map-corner'}); c1.textContent='INDIA · LIVE WEATHER + FLOOD MONITORING'; svg.appendChild(c1);
+  const c2=svgEl('text',{x:10,y:MAP_H-10,class:'map-corner'}); c2.textContent='APPROXIMATE OUTLINE — SELF-CONTAINED, NO EXTERNAL MAP TILES'; svg.appendChild(c2);
+  // national live weather points (real data, 16 cities) — background layer
+  WEATHER_POINTS.forEach(pt=>{
+    const {x,y}=project(pt.lat,pt.lon);
+    const col=weatherColor(Number(pt.precip24h || 0));
+    const g=svgEl('g',{style:'cursor:pointer;'});
+    g.addEventListener('click',(e)=>{ e.stopPropagation(); showWeatherPopup(pt,x,y); });
+    if(pt.alert){
+      svg.appendChild(svgEl('circle',{cx:x,cy:y,r:8,fill:'none',stroke:'#F2A93B',"stroke-width":1.5,class:'pulse-ring'}));
+    }
+    const dot=svgEl('circle',{cx:x,cy:y,r:4.5,fill:col,stroke:'#0A1628',"stroke-width":1,opacity:0.92});
+    g.appendChild(dot);
+    svg.appendChild(g);
+  });
+  // location dots
+  LOCATIONS.forEach(loc=>{
+    const {x,y}=project(loc.lat,loc.lon);
+    const g=svgEl('g',{style:'cursor:pointer;'});
+    g.addEventListener('click',()=>selectLocation(loc.id));
+    const dot=svgEl('circle',{cx:x,cy:y,r:6,fill:'#16294A',stroke:'#8CA0BE',"stroke-width":1.5,class:'map-loc-dot'});
+    const label=svgEl('text',{x:x+9,y:y+3,class:'map-loc-label'}); label.textContent=loc.name.split(',')[0];
+    g.appendChild(dot); g.appendChild(label);
+    svg.appendChild(g);
+    loc._dot=dot; loc._label=label;
+  });
+  // selection ring group (re-created per selection)
+  const ring=svgEl('circle',{cx:0,cy:0,r:9,fill:'none',id:'selRing',"stroke-width":2});
+  const pulse=svgEl('circle',{cx:0,cy:0,r:9,fill:'none',id:'selPulse',class:'pulse-ring',"stroke-width":2});
+  svg.appendChild(ring); svg.appendChild(pulse);
+  mapReady=true;
+  syncMapSelection();
+  renderMapLegend();
+}
+function showWeatherPopup(pt,x,y){
+  const svg=document.getElementById('mapSvg');
+  const rect=svg.getBoundingClientRect();
+  const scaleX=rect.width/MAP_W, scaleY=rect.height/MAP_H;
+  const pop=document.getElementById('weatherPopup');
+  pop.style.left=(x*scaleX+14)+'px';
+  pop.style.top=(y*scaleY-6)+'px';
+  pop.innerHTML=`<b>${pt.name}, ${pt.state}</b><br>${pt.tempC == null ? "—" : pt.tempC + "°C"} · ${pt.phrase || "Waiting for live data"}<br>Humidity ${pt.humidity == null ? "—" : pt.humidity + "%"} · Rain (24h) ${Number(pt.precip24h || 0).toFixed(1)} mm
+    ${pt.alert?`<div class="wp-alert">⚠ ${pt.alert}</div>`:''}`;
+  pop.style.display='block';
+}
+function renderMapLegend(){
+  const el=document.getElementById('mapLegend');
+  const alertCount = WEATHER_POINTS.filter(p=>p.alert).length + LOCATIONS.filter(l=>l.live.alert).length;
+  el.innerHTML = `
+    <div class="legend-row"><span class="sw" style="background:#3A5C8C"></span>&lt;2mm <span class="sw" style="background:#21C4B0"></span>2–10mm <span class="sw" style="background:#F2A93B"></span>10–25mm <span class="sw" style="background:#EB5757"></span>25mm+ (24h rain)</div>
+    <div class="legend-row">${alertCount} active IMD alert${alertCount===1?'':'s'} nationwide right now</div>`;
+}
+document.getElementById('map').addEventListener('click',(e)=>{
+  if(e.target.closest('#weatherPopup')) return;
+  document.getElementById('weatherPopup').style.display='none';
+});
+function syncMapSelection(){
+  if(!mapReady) return;
+  LOCATIONS.forEach(loc=>{
+    const isActive = loc.id===currentLoc.id;
+    loc._dot.setAttribute('r', isActive?8:6);
+    loc._dot.setAttribute('fill', isActive?'#21C4B0':'#16294A');
+    loc._label.setAttribute('class','map-loc-label'+(isActive?' active':''));
+  });
+  const {x,y}=project(currentLoc.lat,currentLoc.lon);
+  ['selRing','selPulse'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.setAttribute('cx',x); el.setAttribute('cy',y);
+  });
+}
+function updateMapRisk(color){
+  if(!mapReady) return;
+  const ring=document.getElementById('selRing'), pulse=document.getElementById('selPulse');
+  ring.setAttribute('stroke',color); pulse.setAttribute('stroke',color);
+}
+let mapReady=false;
+
+/* ---------------- UI: location list ---------------- */
+function renderLocList(){
+  const el = document.getElementById('locList');
+  el.innerHTML='';
+  LOCATIONS.forEach(loc=>{
+    const b = document.createElement('button');
+    b.className='loc-btn'+(loc.id===currentLoc.id?' active':'');
+    b.innerHTML=`<b>${loc.name}</b><small>${loc.basin} · ${loc.elevation} m elev.</small>`;
+    b.onclick=()=>selectLocation(loc.id);
+    el.appendChild(b);
+  });
+}
+function selectLocation(id){
+  currentLoc = LOCATIONS.find(l=>l.id===id);
+  renderLocList();
+  syncMapSelection();
+  applyLiveDefaults();
+  renderLiveCard();
+  updateDashboard();
+  renderStage();
+}
+function applyLiveDefaults(){
+  const d=liveDerivedInputs(currentLoc);
+  rainEl.value=d.rain; durEl.value=d.dur; satEl.value=d.sat;
+}
+function renderLiveCard(){
+  const lv=currentLoc.live;
+  const el=document.getElementById('liveCard');
+  el.innerHTML = `
+    <div class="live-badge">● LIVE</div>
+    <div class="live-row"><span>${lv.tempC == null ? "—" : lv.tempC + "°C"}</span><span>${lv.phrase}</span></div>
+    <div class="live-row"><span>Humidity ${lv.humidity == null ? "—" : lv.humidity + "%"}</span><span>Rain (24h) ${Number(lv.precip24h || 0).toFixed(1)} mm</span></div>
+    ${lv.alert ? `<div class="live-alert">⚠ ${lv.alert}</div>` : ''}
+    <div class="live-meta">Source: ${LIVE_SOURCE}<br>Fetched: ${lv.fetchedAt || "Waiting for API key"}</div>`;
+}
+
+/* ---------------- UI: sliders + gauge + contributions + alert ---------------- */
+const rainEl=document.getElementById('rain'), durEl=document.getElementById('dur'), satEl=document.getElementById('sat');
+[rainEl,durEl,satEl].forEach(el=>el.addEventListener('input',updateDashboard));
+document.getElementById('resetLiveBtn').onclick=()=>{ applyLiveDefaults(); updateDashboard(); };
+document.getElementById('refreshWeatherBtn').onclick=refreshOpenMeteo;
+
+function updateDashboard(){
+  const rain=+rainEl.value, dur=+durEl.value, sat=+satEl.value;
+  document.getElementById('oRain').textContent=rain;
+  document.getElementById('oDur').textContent=dur;
+  document.getElementById('oSat').textContent=sat;
+
+  const r = computeRisk(currentLoc, rain, dur, sat);
+  document.getElementById('scoreNum').textContent=r.score;
+  document.getElementById('scoreNum').style.color=r.color;
+  const badge=document.getElementById('tierBadge');
+  badge.textContent=r.tier+' risk';
+  badge.style.background=r.color+'33'; badge.style.color=r.color; badge.style.border='1px solid '+r.color;
+
+  const circumference=452, offset=circumference-(r.score/100)*circumference;
+  const arc=document.getElementById('gaugeArc');
+  arc.style.stroke=r.color; arc.style.strokeDashoffset=offset;
+
+  updateMapRisk(r.color);
+
+  const cWrap=document.getElementById('contrib'); cWrap.innerHTML='';
+  Object.entries(r.contributions).forEach(([k,v])=>{
+    const pct=Math.round(v*100/ (WEIGHTS[Object.keys(WEIGHTS)[0]]) )*0; // unused
+    const row=document.createElement('div'); row.className='contrib-row';
+    const maxW=Math.max(...Object.values(WEIGHTS));
+    const widthPct = Math.min(100,(v/ (maxWeightOf(k)) )*100);
+    row.innerHTML=`<div class="lbl">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${widthPct}%;background:${r.color}"></div></div><div class="val">${(v*100).toFixed(1)}</div>`;
+    cWrap.appendChild(row);
+  });
+
+  const alertCard=document.getElementById('alertCard');
+  alertCard.style.borderColor=r.color; alertCard.style.background=r.color+'14';
+  alertCard.innerHTML=`<div class="head" style="color:${r.color}">⚠ ${r.tier.toUpperCase()} INUNDATION RISK — ${currentLoc.name}</div>
+    <p>Modelled from ${rain} mm/hr rainfall sustained over ${dur} hrs on ${sat}% saturated ground, combined with ${currentLoc.name}'s known terrain and drainage profile (${currentLoc.basin}). ${
+      r.tier==='Very High'||r.tier==='High'
+      ? 'Recommend issuing a location-level advisory to NDMA/SDMA and pre-positioning emergency response resources.'
+      : 'Continue routine monitoring; no immediate advisory required at this level.'
+    }</p>`;
+}
+function maxWeightOf(label){
+  const map={"Rainfall intensity":WEIGHTS.rain,"Rainfall duration":WEIGHTS.dur,"Soil saturation":WEIGHTS.sat,
+    "Low elevation":WEIGHTS.elev,"Drainage capacity":WEIGHTS.drain,"Terrain susceptibility":WEIGHTS.terrain};
+  return map[label];
+}
+
+/* ================= PIPELINE VIEW ================= */
+const STAGES = [
+  {n:1,label:"Data Collection"},
+  {n:2,label:"Preprocessing"},
+  {n:3,label:"Flood Labels"},
+  {n:4,label:"Data Fusion"},
+  {n:5,label:"ML Model"},
+  {n:6,label:"Inference"},
+  {n:7,label:"Early Warning"},
+];
+let activeStage=1;
+
+function renderStepper(){
+  const el=document.getElementById('stepper'); el.innerHTML='';
+  STAGES.forEach(s=>{
+    const d=document.createElement('div');
+    d.className='step'+(s.n===activeStage?' active':'')+(s.n<activeStage?' done':'');
+    d.innerHTML=`<div class="num">STAGE ${s.n}</div><div class="lbl">${s.label}</div>`;
+    d.onclick=()=>{activeStage=s.n; renderStepper(); renderStage();};
+    el.appendChild(d);
+  });
+}
+
+function rng(extra){return mulberry32(seedFromString(currentLoc.id+'|'+extra+'|'+rainEl.value+'|'+durEl.value+'|'+satEl.value));}
+
+function drawGrid(canvas, colorFn, cells=12){
+  const ctx=canvas.getContext('2d'); const w=canvas.width=220,h=canvas.height=140;
+  const cw=w/cells, ch=h/cells;
+  for(let y=0;y<cells;y++)for(let x=0;x<cells;x++){
+    ctx.fillStyle=colorFn(x,y,cells);
+    ctx.fillRect(x*cw,y*ch,cw+1,ch+1);
+  }
+}
+function heatColor(v){ // v 0..1 -> green(low) -> yellow -> orange -> red(high), matching risk tier colors
+  const stops=[[46,204,113],[242,201,76],[242,153,74],[235,87,87]];
+  const seg = v*(stops.length-1);
+  const i = Math.min(stops.length-2, Math.floor(seg));
+  const t = seg - i;
+  const a=stops[i], b=stops[i+1];
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+}
+
+function renderStage(){
+  renderStepper();
+  const panel=document.getElementById('stagePanel');
+  const rain=+rainEl.value, dur=+durEl.value, sat=+satEl.value;
+  const r = computeRisk(currentLoc, rain, dur, sat);
+
+  if(activeStage===1){
+    panel.innerHTML=`<div class="stage-title">1 · Data Collection</div>
+      <div class="stage-sub">Multi-source inputs for ${currentLoc.name} — IMERG rainfall, DEM terrain, radar reflectivity, NWP forecast.</div>
+      <div class="grid4">
+        <div class="cvs-card"><canvas id="c1"></canvas><p>Rainfall (IMERG-style)</p></div>
+        <div class="cvs-card"><canvas id="c2"></canvas><p>Terrain (DEM)</p></div>
+        <div class="cvs-card"><canvas id="c3"></canvas><p>Radar reflectivity</p></div>
+        <div class="cvs-card"><canvas id="c4"></canvas><p>NWP forecast trend</p></div>
+      </div>`;
+    const g1=rng('rain'), g2=rng('dem'), g3=rng('radar');
+    drawGrid(document.getElementById('c1'), (x,y,c)=>heatColor(Math.min(1,(g1()*.6+rain/150*.4))));
+    drawGrid(document.getElementById('c2'), (x,y,c)=>heatColor(1-Math.min(1,(y/c)*.7+g2()*.3)));
+    drawGrid(document.getElementById('c3'), (x,y,c)=>heatColor(Math.min(1,g3()*.5+dur/48*.5)));
+    const c4=document.getElementById('c4'); const ctx=c4.getContext('2d'); c4.width=220;c4.height=140;
+    ctx.strokeStyle='#21C4B0'; ctx.lineWidth=2; ctx.beginPath();
+    const g4=rng('nwp');
+    for(let i=0;i<24;i++){const x=i/23*220; const y=140-((Math.sin(i/3)+1)/2*.5+g4()*.3+rain/150*.2)*130-5; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();
+  }
+
+  if(activeStage===2){
+    panel.innerHTML=`<div class="stage-title">2 · Preprocessing</div>
+      <div class="stage-sub">Quality control and alignment before fusion.</div>
+      <div class="checklist" id="chk">
+        <div class="check-item"><div class="c">✓</div>Reprojected all layers to a common CRS</div>
+        <div class="check-item"><div class="c">✓</div>Clipped to ${currentLoc.name} area of interest</div>
+        <div class="check-item"><div class="c">✓</div>Removed noise / cloud-contaminated cells</div>
+        <div class="check-item"><div class="c">✓</div>Resampled to a common 1&nbsp;km grid</div>
+        <div class="check-item"><div class="c">✓</div>Standardized units and null handling</div>
+      </div>`;
+    document.querySelectorAll('#chk .check-item').forEach((el,i)=>setTimeout(()=>el.classList.add('show'),150*i));
+  }
+
+  if(activeStage===3){
+    panel.innerHTML=`<div class="stage-title">3 · Flood Label Generation</div>
+      <div class="stage-sub">Synthetic SAR-style change detection (pre-event vs post-event) → binary flood mask.</div>
+      <div class="grid4">
+        <div class="cvs-card"><canvas id="s1"></canvas><p>Pre-event SAR</p></div>
+        <div class="cvs-card"><canvas id="s2"></canvas><p>Post-event SAR</p></div>
+        <div class="cvs-card"><canvas id="s3"></canvas><p>Change detection</p></div>
+        <div class="cvs-card"><canvas id="s4"></canvas><p>Flood mask (0/1)</p></div>
+      </div>`;
+    const gp=rng('pre'), gq=rng('post');
+    const pre=[],post=[];
+    const cells=12;
+    for(let i=0;i<cells*cells;i++){pre.push(gp()); post.push(Math.min(1,pre[i]*.6+gq()*.6*(r.score/100+.3)));}
+    drawGrid(document.getElementById('s1'), (x,y,c)=>{const v=pre[y*c+x]; return `rgb(${v*180+20},${v*180+20},${v*180+20})`;});
+    drawGrid(document.getElementById('s2'), (x,y,c)=>{const v=post[y*c+x]; return `rgb(${v*180+20},${v*180+20},${v*180+20})`;});
+    drawGrid(document.getElementById('s3'), (x,y,c)=>{const d=Math.abs(post[y*c+x]-pre[y*c+x]); return heatColor(d);});
+    drawGrid(document.getElementById('s4'), (x,y,c)=>{const d=Math.abs(post[y*c+x]-pre[y*c+x]); return d>0.28 ? '#EB5757':'#16294A';});
+  }
+
+  if(activeStage===4){
+    panel.innerHTML=`<div class="stage-title">4 · Data Fusion</div>
+      <div class="stage-sub">All preprocessed layers combined into one multi-channel feature stack, cell-aligned on a common grid.</div>
+      <div style="display:flex;gap:24px;align-items:center;">
+        <div class="cvs-card" style="width:260px;"><canvas id="fu"></canvas><p>Fused multi-channel stack (top layer shown)</p></div>
+        <div style="flex:1;font-size:12.5px;color:#D9E4F2;line-height:2;">
+          <div>▸ Channel 1 — Rainfall (IMERG)</div>
+          <div>▸ Channel 2 — Terrain (DEM)</div>
+          <div>▸ Channel 3 — Slope</div>
+          <div>▸ Channel 4 — Radar reflectivity</div>
+          <div>▸ Channel 5 — SAR pre-event</div>
+          <div>▸ Channel 6 — SAR flood label</div>
+        </div>
+      </div>`;
+    const gf=rng('fuse');
+    drawGrid(document.getElementById('fu'), (x,y,c)=>heatColor(Math.min(1,gf()*.5+r.score/100*.5)));
+  }
+
+  if(activeStage===5){
+    panel.innerHTML=`<div class="stage-title">5 · ML Model</div>
+      <div class="stage-sub">Interpretable baseline (Random-Forest-style weighted scoring) learns flood probability from fused features. Live feature contributions for current inputs:</div>
+      <div class="contrib" id="pcontrib" style="max-width:640px;"></div>`;
+    const cWrap=document.getElementById('pcontrib');
+    Object.entries(r.contributions).forEach(([k,v])=>{
+      const widthPct = Math.min(100,(v/maxWeightOf(k))*100);
+      const row=document.createElement('div'); row.className='contrib-row';
+      row.innerHTML=`<div class="lbl">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${widthPct}%;background:${r.color}"></div></div><div class="val">${(v*100).toFixed(1)}</div>`;
+      cWrap.appendChild(row);
+    });
+  }
+
+  if(activeStage===6){
+    panel.innerHTML=`<div class="stage-title">6 · Prediction &amp; Inference</div>
+      <div class="stage-sub">Flood probability mapped across the target grid around ${currentLoc.name}.</div>
+      <div style="display:flex;gap:24px;align-items:flex-start;">
+        <div class="cvs-card" style="width:280px;"><canvas id="riskgrid"></canvas><p>Risk grid (green→red = low→very high)</p></div>
+        <div style="flex:1;">
+          <div class="gauge-wrap">
+            <div class="gauge"><svg width="170" height="170">
+              <circle cx="85" cy="85" r="72" stroke="#223353" stroke-width="14" fill="none"/>
+              <circle cx="85" cy="85" r="72" stroke="${r.color}" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="${452-(r.score/100)*452}"/>
+            </svg><div class="gauge-num"><span class="n" style="color:${r.color}">${r.score}</span><span class="t">risk score</span></div></div>
+            <div class="tier-badge" style="background:${r.color}33;color:${r.color};border:1px solid ${r.color};">${r.tier} risk</div>
+          </div>
+        </div>
+      </div>`;
+    const gr=rng('grid');
+    drawGrid(document.getElementById('riskgrid'), (x,y,c)=>{
+      const dx=(x-c/2)/(c/2), dy=(y-c/2)/(c/2); const dist=Math.sqrt(dx*dx+dy*dy);
+      const v=Math.max(0,Math.min(1,(r.score/100)*(1-dist*.5)+gr()*.15));
+      return heatColor(v);
+    },14);
+  }
+
+  if(activeStage===7){
+    panel.innerHTML=`<div class="stage-title">7 · Output &amp; Impact</div>
+      <div class="stage-sub">Risk translated into an actionable alert for responders and dashboards.</div>
+      <div class="alert-card" style="border-color:${r.color};background:${r.color}14;max-width:680px;">
+        <div class="head" style="color:${r.color}">⚠ ${r.tier.toUpperCase()} INUNDATION RISK — ${currentLoc.name}</div>
+        <p>Risk score ${r.score}/100. Generated from current pipeline run using ${rainEl.value} mm/hr rainfall over ${durEl.value} hrs, ${satEl.value}% soil saturation, and ${currentLoc.name}'s terrain/drainage profile.</p>
+      </div>
+      <div class="two-col" style="margin-top:16px;max-width:680px;">
+        <div class="panel" style="padding:14px;"><h2>Early Warnings</h2><p style="font-size:12px;color:#D9E4F2;">Location-level advisory queued for NDMA/SDMA distribution.</p></div>
+        <div class="panel" style="padding:14px;"><h2>Dashboard / Alerts</h2><p style="font-size:12px;color:#D9E4F2;">Web dashboard + optional SMS/app alert channel for affected communities.</p></div>
+      </div>`;
+  }
+}
+
+document.getElementById('runPipelineBtn').onclick=function(){
+  const btn=this; btn.disabled=true; let i=1;
+  const iv=setInterval(()=>{
+    activeStage=i; renderStage();
+    i++;
+    if(i>7){clearInterval(iv); btn.disabled=false;}
+  },700);
+};
+
+/* ---------------- tabs ---------------- */
+document.getElementById('tab-pipeline').onclick=()=>switchTab('pipeline');
+document.getElementById('tab-dash').onclick=()=>switchTab('dash');
+function switchTab(t){
+  document.getElementById('tab-pipeline').classList.toggle('active',t==='pipeline');
+  document.getElementById('tab-dash').classList.toggle('active',t==='dash');
+  document.getElementById('view-pipeline').classList.toggle('active',t==='pipeline');
+  document.getElementById('view-dash').classList.toggle('active',t==='dash');
+  if(t==='dash' && !mapReady){ initMap(); }
+}
+
+/* ---------------- init ---------------- */
+renderLocList();
+applyLiveDefaults();
+renderLiveCard();
+updateDashboard();
+renderStage();
+
+// Populate the prototype with live Open-Meteo data.
+refreshOpenMeteo();
+</script>
+</body>
+</html>
