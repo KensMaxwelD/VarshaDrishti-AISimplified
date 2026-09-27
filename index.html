@@ -164,11 +164,7 @@
           <input type="range" id="sat" min="0" max="100" value="55">
         </div>
         <button id="resetLiveBtn" class="reset-live-btn">↺ Reset to live conditions</button>
-<<<<<<< HEAD
         <button id="refreshWeatherBtn" class="reset-live-btn">↻ Refresh Weather</button>
-=======
-        <button id="refreshWeatherBtn" class="reset-live-btn">↻ Refresh AccuWeather</button>
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
         <div class="note">Coordinates are real locations. Sliders start from a live weather snapshot (see card above) and can be adjusted for scenario testing.</div>
       </div>
 
@@ -220,16 +216,9 @@ const LOCATIONS = [
   {id:"srinagar", name:"Srinagar, J&K", basin:"Jhelum valley", lat:34.0837, lon:74.7973, elevation:1585, drainage:0.55, terrainRisk:0.55},
 ];
 
-<<<<<<< HEAD
 /* ---------------- Open-Meteo live weather ---------------- */
 // No API key is required for the non-commercial Open-Meteo API.
 const LIVE_SOURCE = "Open-Meteo (live current conditions)";
-=======
-/* ---------------- AccuWeather live weather ---------------- */
-// The API key is intentionally NOT stored in this browser file.
-// Vercel keeps it server-side in ACCUWEATHER_API_KEY.
-const LIVE_SOURCE = "AccuWeather (live current conditions)";
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
 const LIVE = {};
 LOCATIONS.forEach(loc => {
   LIVE[loc.id] = {
@@ -258,36 +247,22 @@ const WEATHER_POINTS = [
   {name:"Amaravati",state:"Andhra Pradesh",lat:16.511,lon:80.511}
 ];
 
-<<<<<<< HEAD
 async function fetchOpenMeteoForCoords(lat, lon){
-=======
-async function fetchAccuWeatherForCoords(lat, lon){
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
   const res = await fetch(`/api/weather?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`);
   const data = await res.json().catch(()=>({}));
   if(!res.ok) throw new Error(data.error || `Weather proxy HTTP ${res.status}`);
   return data;
 }
 
-<<<<<<< HEAD
 async function fetchOpenMeteoForLocation(loc){
   const data = await fetchOpenMeteoForCoords(loc.lat, loc.lon);
-=======
-async function fetchAccuWeatherForLocation(loc){
-  const data = await fetchAccuWeatherForCoords(loc.lat, loc.lon);
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
   Object.assign(loc.live, data);
   loc.live.fetchedAt = new Date().toISOString();
   return data;
 }
 
-<<<<<<< HEAD
 async function fetchOpenMeteoForPoint(pt){
   const data = await fetchOpenMeteoForCoords(pt.lat, pt.lon);
-=======
-async function fetchAccuWeatherForPoint(pt){
-  const data = await fetchAccuWeatherForCoords(pt.lat, pt.lon);
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
   pt.tempC = data.tempC;
   pt.humidity = data.humidity;
   pt.precip24h = data.precip24h;
@@ -297,17 +272,12 @@ async function fetchAccuWeatherForPoint(pt){
   return data;
 }
 
-<<<<<<< HEAD
 async function refreshOpenMeteo(){
-=======
-async function refreshAccuWeather(){
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
   const btn=document.getElementById('refreshWeatherBtn');
   if(btn) { btn.disabled=true; btn.textContent='↻ Updating…'; }
   let failures=0;
   try{
     const results = await Promise.allSettled([
-<<<<<<< HEAD
       ...LOCATIONS.map(loc => fetchOpenMeteoForLocation(loc)),
       ...WEATHER_POINTS.map(pt => fetchOpenMeteoForPoint(pt))
     ]);
@@ -322,32 +292,12 @@ async function refreshAccuWeather(){
   }catch(e){
     console.error(e);
     window.weatherStatus='Open-Meteo unavailable';
-=======
-      ...LOCATIONS.map(loc => fetchAccuWeatherForLocation(loc)),
-      ...WEATHER_POINTS.map(pt => fetchAccuWeatherForPoint(pt))
-    ]);
-    failures = results.filter(r=>r.status==='rejected').length;
-    if(failures===0){
-      window.weatherStatus='Live AccuWeather data';
-    } else if(failures < results.length){
-      window.weatherStatus=`AccuWeather partially updated (${failures} failed)`;
-    } else {
-      window.weatherStatus='AccuWeather unavailable';
-    }
-  }catch(e){
-    console.error(e);
-    window.weatherStatus='AccuWeather unavailable';
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
     failures=1;
   }finally{
     renderLocList();
     renderLiveCard();
     updateDashboard();
-<<<<<<< HEAD
     if(btn){ btn.disabled=false; btn.textContent='↻ Refresh Weather'; }
-=======
-    if(btn){ btn.disabled=false; btn.textContent='↻ Refresh AccuWeather'; }
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
   }
 }
 
@@ -564,11 +514,7 @@ function renderLiveCard(){
 const rainEl=document.getElementById('rain'), durEl=document.getElementById('dur'), satEl=document.getElementById('sat');
 [rainEl,durEl,satEl].forEach(el=>el.addEventListener('input',updateDashboard));
 document.getElementById('resetLiveBtn').onclick=()=>{ applyLiveDefaults(); updateDashboard(); };
-<<<<<<< HEAD
 document.getElementById('refreshWeatherBtn').onclick=refreshOpenMeteo;
-=======
-document.getElementById('refreshWeatherBtn').onclick=refreshAccuWeather;
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
 
 function updateDashboard(){
   const rain=+rainEl.value, dur=+durEl.value, sat=+satEl.value;
@@ -809,13 +755,8 @@ renderLiveCard();
 updateDashboard();
 renderStage();
 
-<<<<<<< HEAD
 // Populate the prototype with live Open-Meteo data.
 refreshOpenMeteo();
-=======
-// If a real key has been inserted above, populate the prototype with live AccuWeather data.
-refreshAccuWeather();
->>>>>>> 62cd7e2e23b56d71483d7086cca9b91cda064602
 </script>
 </body>
 </html>
