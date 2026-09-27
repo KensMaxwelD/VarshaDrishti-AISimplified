@@ -12,49 +12,53 @@
     --teal:#21C4B0; --amber:#F2A93B; --text:#EAF2FA; --muted:#8CA0BE;
     --low:#2ECC71; --med:#F2C94C; --high:#F2994A; --vhigh:#EB5757;
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;}
   .mono{font-family:'IBM Plex Mono',monospace;}
-  header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0D1C33,#0A1628);}
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0D1C33,#0A1628);gap:16px;}
   .brand{display:flex;align-items:center;gap:12px;}
-  .brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--teal),#0E7C6F);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#03211C;}
+  .brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--teal),#0E7C6F);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#03211C;flex-shrink:0;}
   .brand h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.2px;}
   .brand span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px;}
   nav{display:flex;gap:4px;background:var(--panel);padding:4px;border-radius:10px;border:1px solid var(--border);}
-  nav button{background:transparent;border:none;color:var(--muted);padding:9px 18px;border-radius:7px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit;}
+  nav button{background:transparent;border:none;color:var(--muted);padding:9px 18px;border-radius:7px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);}
+  nav button:active:not(:disabled){transform:scale(0.97);}
   nav button.active{background:var(--teal);color:#03211C;font-weight:600;}
   .status{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--low);box-shadow:0 0 6px var(--low);}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--low);box-shadow:0 0 6px var(--low);flex-shrink:0;}
 
   main{padding:24px 28px 60px;max-width:1360px;margin:0 auto;}
-  .view{display:none;} .view.active{display:block;}
+  .view{display:none;opacity:0;transition:opacity 0.25s ease;}
+  .view.active{display:block;opacity:1;}
 
   /* ---- Dashboard ---- */
   .dash{display:grid;grid-template-columns:290px 1fr;gap:20px;}
   .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;}
   .panel h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:0 0 12px;font-weight:600;}
   .loc-list{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;}
-  .loc-btn{text-align:left;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;cursor:pointer;font-size:12.5px;font-family:inherit;line-height:1.35;}
+  .loc-btn{text-align:left;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;cursor:pointer;font-size:12.5px;font-family:inherit;line-height:1.35;transition:all 0.2s ease;}
+  .loc-btn:active{transform:scale(0.98);}
   .loc-btn b{display:block;font-size:13px;}
   .loc-btn small{color:var(--muted);}
   .loc-btn.active{border-color:var(--teal);background:#123A34;}
   .slider-row{margin-bottom:16px;}
   .slider-row label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:6px;}
   .slider-row output{color:var(--text);font-weight:600;}
-  input[type=range]{width:100%;accent-color:var(--teal);}
+  input[type=range]{width:100%;accent-color:var(--teal);height:24px;cursor:pointer;touch-action:manipulation;}
   .note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
   .live-card{background:#0E2A28;border:1px solid #1E4A45;border-radius:8px;padding:10px 12px;margin-bottom:18px;font-size:11.5px;}
   .live-badge{color:var(--teal);font-weight:700;font-size:10.5px;letter-spacing:.5px;margin-bottom:6px;}
   .live-row{display:flex;justify-content:space-between;color:#D9E4F2;margin-bottom:3px;}
   .live-alert{margin-top:6px;padding:6px 8px;background:#3A2410;border:1px solid var(--amber);border-radius:6px;color:var(--amber);font-size:10.5px;font-weight:600;}
   .live-meta{margin-top:8px;padding-top:8px;border-top:1px solid #1E4A45;color:var(--muted);font-size:9.5px;font-family:'IBM Plex Mono',monospace;line-height:1.5;}
-  .reset-live-btn{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--teal);padding:8px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;}
+  .reset-live-btn{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--teal);padding:10px 8px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;min-height:40px;transition:all 0.2s ease;}
+  .reset-live-btn:active:not(:disabled){transform:scale(0.98);}
 
   .dash-main{display:flex;flex-direction:column;gap:20px;}
   #map{height:380px;border-radius:12px;border:1px solid var(--border);background:radial-gradient(ellipse at 50% 40%,#122744,#0A1628);position:relative;overflow:hidden;}
-  .weather-popup{position:absolute;display:none;background:#0E2237;border:1px solid #2E4E78;border-radius:8px;padding:8px 10px;font-size:10.5px;color:#D9E4F2;line-height:1.5;max-width:190px;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.4);z-index:5;}
+  .weather-popup{position:absolute;display:none;background:#0E2237;border:1px solid #2E4E78;border-radius:8px;padding:8px 10px;font-size:10.5px;color:#D9E4F2;line-height:1.5;max-width:210px;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.4);z-index:5;transition:left 0.15s ease, top 0.15s ease;}
   .wp-alert{margin-top:4px;padding:4px 6px;background:#3A2410;border:1px solid var(--amber);border-radius:5px;color:var(--amber);font-size:9.5px;font-weight:600;}
-  .map-legend{position:absolute;right:10px;bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#8CA0BE;text-align:right;line-height:1.6;}
+  .map-legend{position:absolute;right:10px;bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#8CA0BE;text-align:right;line-height:1.6;pointer-events:none;}
   .legend-row{display:flex;align-items:center;justify-content:flex-end;gap:4px;}
   .sw{width:8px;height:8px;border-radius:2px;display:inline-block;margin-left:4px;}
   #map svg{width:100%;height:100%;display:block;}
@@ -78,22 +82,25 @@
   .contrib-row{display:grid;grid-template-columns:150px 1fr 46px;align-items:center;gap:10px;}
   .contrib-row .lbl{font-size:12px;color:var(--muted);}
   .bar-track{height:8px;background:var(--panel2);border-radius:4px;overflow:hidden;}
-  .bar-fill{height:100%;border-radius:4px;background:var(--teal);}
+  .bar-fill{height:100%;border-radius:4px;background:var(--teal);transition:width 0.3s ease;}
   .contrib-row .val{font-size:11.5px;text-align:right;font-family:'IBM Plex Mono',monospace;color:var(--muted);}
 
-  .alert-card{border-radius:10px;padding:16px 18px;border:1px solid var(--border);}
+  .alert-card{border-radius:10px;padding:16px 18px;border:1px solid var(--border);transition:all 0.3s ease;}
   .alert-card .head{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;margin-bottom:6px;}
   .alert-card p{margin:0;font-size:12.5px;color:#D9E4F2;line-height:1.6;}
 
   /* ---- Pipeline ---- */
-  .stepper{display:flex;gap:6px;margin-bottom:20px;}
-  .step{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;}
+  .stepper{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none;}
+  .stepper::-webkit-scrollbar{display:none;}
+  .step{flex:1;min-width:115px;scroll-snap-align:start;flex-shrink:0;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;user-select:none;transition:all 0.2s ease;}
+  .step:active{transform:scale(0.97);}
   .step .num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
-  .step .lbl{font-size:11.5px;font-weight:600;margin-top:2px;}
+  .step .lbl{font-size:11.5px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .step.done{border-color:var(--teal);}
   .step.active{background:#123A34;border-color:var(--teal);}
   .runbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-  .run-btn{background:var(--teal);color:#03211C;border:none;padding:10px 20px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;}
+  .run-btn{background:var(--teal);color:#03211C;border:none;padding:10px 20px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;min-height:40px;transition:all 0.2s ease;}
+  .run-btn:active:not(:disabled){transform:scale(0.98);}
   .run-btn:disabled{opacity:.5;cursor:default;}
   .stage-panel{min-height:360px;}
   .stage-title{font-size:15px;font-weight:600;margin:0 0 4px;}
@@ -107,7 +114,114 @@
   .check-item.show{opacity:1;transform:none;}
   .check-item .c{width:18px;height:18px;border-radius:50%;background:var(--teal);color:#03211C;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .stage-flex-container{display:flex;gap:24px;align-items:center;}
   footer{text-align:center;color:var(--muted);font-size:11px;padding:20px;border-top:1px solid var(--border);}
+
+  /* ---- Responsive Media Queries ---- */
+  @media (max-width: 860px) {
+    header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+    nav {
+      width: 100%;
+      justify-content: center;
+    }
+    nav button {
+      flex: 1;
+      text-align: center;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+    .status {
+      justify-content: center;
+      font-size: 11px;
+    }
+    main {
+      padding: 16px 14px 40px;
+    }
+    .dash {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .dash-main {
+      gap: 16px;
+    }
+    #map {
+      height: 300px;
+    }
+    .map-corner {
+      font-size: 8.5px;
+    }
+    .score-row {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .gauge-wrap {
+      margin-bottom: 8px;
+    }
+    .contrib-row {
+      grid-template-columns: 130px 1fr 42px;
+      gap: 8px;
+    }
+    .grid4 {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .two-col {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .runbar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .run-btn {
+      width: 100%;
+      padding: 12px;
+    }
+    .stage-flex-container {
+      flex-direction: column;
+      align-items: stretch !important;
+      gap: 16px !important;
+    }
+    .stage-flex-container > div:first-child {
+      width: 100% !important;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .brand h1 {
+      font-size: 15px;
+    }
+    .brand span {
+      font-size: 10.5px;
+    }
+    .loc-btn {
+      padding: 10px 10px;
+      font-size: 12px;
+    }
+    .contrib-row {
+      grid-template-columns: 110px 1fr 36px;
+    }
+    .contrib-row .lbl {
+      font-size: 11px;
+    }
+    #map {
+      height: 260px;
+    }
+    .stage-title {
+      font-size: 14px;
+    }
+    .stage-sub {
+      font-size: 11.5px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -434,13 +548,28 @@ function initMap(){
 function showWeatherPopup(pt,x,y){
   const svg=document.getElementById('mapSvg');
   const rect=svg.getBoundingClientRect();
+  const mapContainer=document.getElementById('map');
+  const containerRect=mapContainer.getBoundingClientRect();
   const scaleX=rect.width/MAP_W, scaleY=rect.height/MAP_H;
   const pop=document.getElementById('weatherPopup');
-  pop.style.left=(x*scaleX+14)+'px';
-  pop.style.top=(y*scaleY-6)+'px';
+
   pop.innerHTML=`<b>${pt.name}, ${pt.state}</b><br>${pt.tempC == null ? "—" : pt.tempC + "°C"} · ${pt.phrase || "Waiting for live data"}<br>Humidity ${pt.humidity == null ? "—" : pt.humidity + "%"} · Rain (24h) ${Number(pt.precip24h || 0).toFixed(1)} mm
     ${pt.alert?`<div class="wp-alert">⚠ ${pt.alert}</div>`:''}`;
   pop.style.display='block';
+
+  const popRect=pop.getBoundingClientRect();
+  let posX = x*scaleX + 10;
+  let posY = y*scaleY - 6;
+
+  if(posX + popRect.width > containerRect.width - 10){
+    posX = Math.max(10, containerRect.width - popRect.width - 10);
+  }
+  if(posY + popRect.height > containerRect.height - 10){
+    posY = Math.max(10, containerRect.height - popRect.height - 10);
+  }
+
+  pop.style.left=posX+'px';
+  pop.style.top=posY+'px';
 }
 function renderMapLegend(){
   const el=document.getElementById('mapLegend');
@@ -578,8 +707,15 @@ function renderStepper(){
     const d=document.createElement('div');
     d.className='step'+(s.n===activeStage?' active':'')+(s.n<activeStage?' done':'');
     d.innerHTML=`<div class="num">STAGE ${s.n}</div><div class="lbl">${s.label}</div>`;
-    d.onclick=()=>{activeStage=s.n; renderStepper(); renderStage();};
+    d.onclick=()=>{
+      activeStage=s.n;
+      renderStage();
+      d.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+    };
     el.appendChild(d);
+    if(s.n===activeStage){
+      setTimeout(()=>d.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'}), 50);
+    }
   });
 }
 
@@ -663,7 +799,7 @@ function renderStage(){
   if(activeStage===4){
     panel.innerHTML=`<div class="stage-title">4 · Data Fusion</div>
       <div class="stage-sub">All preprocessed layers combined into one multi-channel feature stack, cell-aligned on a common grid.</div>
-      <div style="display:flex;gap:24px;align-items:center;">
+      <div class="stage-flex-container">
         <div class="cvs-card" style="width:260px;"><canvas id="fu"></canvas><p>Fused multi-channel stack (top layer shown)</p></div>
         <div style="flex:1;font-size:12.5px;color:#D9E4F2;line-height:2;">
           <div>▸ Channel 1 — Rainfall (IMERG)</div>
@@ -694,7 +830,7 @@ function renderStage(){
   if(activeStage===6){
     panel.innerHTML=`<div class="stage-title">6 · Prediction &amp; Inference</div>
       <div class="stage-sub">Flood probability mapped across the target grid around ${currentLoc.name}.</div>
-      <div style="display:flex;gap:24px;align-items:flex-start;">
+      <div class="stage-flex-container">
         <div class="cvs-card" style="width:280px;"><canvas id="riskgrid"></canvas><p>Risk grid (green→red = low→very high)</p></div>
         <div style="flex:1;">
           <div class="gauge-wrap">
@@ -741,11 +877,26 @@ document.getElementById('runPipelineBtn').onclick=function(){
 document.getElementById('tab-pipeline').onclick=()=>switchTab('pipeline');
 document.getElementById('tab-dash').onclick=()=>switchTab('dash');
 function switchTab(t){
-  document.getElementById('tab-pipeline').classList.toggle('active',t==='pipeline');
-  document.getElementById('tab-dash').classList.toggle('active',t==='dash');
-  document.getElementById('view-pipeline').classList.toggle('active',t==='pipeline');
-  document.getElementById('view-dash').classList.toggle('active',t==='dash');
-  if(t==='dash' && !mapReady){ initMap(); }
+  const tabPipe = document.getElementById('tab-pipeline');
+  const tabDash = document.getElementById('tab-dash');
+  const viewPipe = document.getElementById('view-pipeline');
+  const viewDash = document.getElementById('view-dash');
+
+  tabPipe.classList.toggle('active', t==='pipeline');
+  tabDash.classList.toggle('active', t==='dash');
+
+  if(t==='dash'){
+    viewPipe.classList.remove('active');
+    setTimeout(()=>{
+      viewDash.classList.add('active');
+      if(!mapReady){ initMap(); } else { syncMapSelection(); }
+    }, 50);
+  } else {
+    viewDash.classList.remove('active');
+    setTimeout(()=>{
+      viewPipe.classList.add('active');
+    }, 50);
+  }
 }
 
 /* ---------------- init ---------------- */
