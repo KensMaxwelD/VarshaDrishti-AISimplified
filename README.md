@@ -18,9 +18,6 @@ pip install -r requirements.txt
 uvicorn backend.api:app --reload
 ```
 
-Open `http://127.0.0.1:8000`.
-
-Health endpoint: `http://127.0.0.1:8000/api/health`
 
 ## Scientific implementation order
 
